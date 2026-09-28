@@ -170,10 +170,8 @@ public class HomeFrame extends JFrame {
     }
 
     private void openReportAccidentPage() {
-        showComingSoon("Accident report page will open here.");
-        // Later:
-        // new QuickAccidentReportFrame().setVisible(true);
-        // dispose();
+        new QuickAccidentReportFrame().setVisible(true);
+        dispose();
     }
 
     private void openCheckStatusPage() {
