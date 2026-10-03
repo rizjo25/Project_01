@@ -1,3 +1,4 @@
+
 package roadaccident.ui;
 
 import roadaccident.model.Accident;
@@ -10,27 +11,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.time.format.ResolverStyle;
 
 public class QuickAccidentReportFrame extends JFrame {
 
-    // Date and time formats
-    private static final DateTimeFormatter DATE_FMT =
-            DateTimeFormatter.ofPattern("uuuu-MM-dd")
-                    .withResolverStyle(ResolverStyle.STRICT);
-
-    private static final DateTimeFormatter TIME_FMT =
-            DateTimeFormatter.ofPattern("HH:mm");
-
-
-    // location
+    // Location
     private static final String[] LOCATIONS = {
-    "KOZHIKODE ZONE",
-    "WESTHIL ZONE",
-    "EASTHIL ZONE"
-};
+            "KOZHIKODE ZONE",
+            "WESTHIL ZONE",
+            "EASTHIL ZONE"
+    };
 
     // Accident types
     private static final String[] ACCIDENT_TYPES = {
@@ -69,7 +58,9 @@ public class QuickAccidentReportFrame extends JFrame {
     public QuickAccidentReportFrame() {
 
         setTitle("Report Accident");
+
         setSize(560, 780);
+
         setMinimumSize(new Dimension(520, 600));
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -95,11 +86,13 @@ public class QuickAccidentReportFrame extends JFrame {
         JPanel header = new JPanel();
 
         header.setLayout(new BoxLayout(header, BoxLayout.Y_AXIS));
+
         header.setBorder(new EmptyBorder(25, 30, 15, 30));
 
         JLabel title = new JLabel("Report an Accident");
 
         title.setFont(new Font("Arial", Font.BOLD, 24));
+
         title.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JLabel subtitle = new JLabel(
@@ -107,10 +100,13 @@ public class QuickAccidentReportFrame extends JFrame {
         );
 
         subtitle.setFont(new Font("Arial", Font.PLAIN, 13));
+
         subtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         header.add(title);
+
         header.add(Box.createRigidArea(new Dimension(0, 8)));
+
         header.add(subtitle);
 
         return header;
@@ -127,21 +123,23 @@ public class QuickAccidentReportFrame extends JFrame {
 
         phoneField = new JTextField();
 
-        // Set current date
+        // Automatically set current local date
         dateField = new JTextField(
-                LocalDate.now().format(DATE_FMT)
+                LocalDate.now().toString()
         );
 
-        // Set current time
+        // Automatically set current local time
         timeField = new JTextField(
-                LocalTime.now().format(TIME_FMT)
+                LocalTime.now().toString().substring(0, 5)
         );
 
+        // Location
         locationBox = new JComboBox<>(LOCATIONS);
 
-        // Create combo boxes
+        // Accident type
         typeBox = new JComboBox<>(ACCIDENT_TYPES);
 
+        // Accident severity
         severityBox = new JComboBox<>(SEVERITIES);
 
         // Create spinner
@@ -153,6 +151,7 @@ public class QuickAccidentReportFrame extends JFrame {
         descriptionArea = new JTextArea(4, 20);
 
         descriptionArea.setLineWrap(true);
+
         descriptionArea.setWrapStyleWord(true);
 
         // Scroll pane for description
@@ -167,6 +166,7 @@ public class QuickAccidentReportFrame extends JFrame {
         JPanel form = new JPanel();
 
         form.setLayout(new BoxLayout(form, BoxLayout.Y_AXIS));
+
         form.setBorder(new EmptyBorder(10, 30, 10, 30));
 
         // Add form fields
@@ -182,15 +182,15 @@ public class QuickAccidentReportFrame extends JFrame {
         addRow(
                 form,
                 row(
-                        block("DATE (yyyy-MM-dd)", dateField),
-                        block("TIME (HH:mm)", timeField)
+                        block("DATE", dateField),
+                        block("TIME", timeField)
                 )
         );
 
         addRow(
                 form,
-                       block("LOCATION", locationBox)
-         );
+                block("LOCATION", locationBox)
+        );
 
         addRow(
                 form,
@@ -343,6 +343,7 @@ public class QuickAccidentReportFrame extends JFrame {
 
         // Add buttons
         panel.add(backButton);
+
         panel.add(submitButton);
 
         // Pressing Enter will submit the form
@@ -373,8 +374,6 @@ public class QuickAccidentReportFrame extends JFrame {
         String time =
                 timeField.getText().trim();
 
-    
-
         String description =
                 descriptionArea.getText().trim();
 
@@ -393,44 +392,18 @@ public class QuickAccidentReportFrame extends JFrame {
         if (!phone.matches("\\+?[0-9]{10}")) {
 
             fail(
-                    "Please enter a valid phone number (7 to 15 digits).",
+                    "Please enter a valid phone number.",
                     phoneField
             );
 
             return;
         }
 
-        // Check date
-        try {
+        // No date validation
+        // Date is automatically taken from LocalDate.now()
 
-            LocalDate.parse(date, DATE_FMT);
-
-        } catch (DateTimeParseException ex) {
-
-            fail(
-                    "Date must be a real date in yyyy-MM-dd format.",
-                    dateField
-            );
-
-            return;
-        }
-
-        // Check time
-        try {
-
-            LocalTime.parse(time, TIME_FMT);
-
-        } catch (DateTimeParseException ex) {
-
-            fail(
-                    "Time must be in 24-hour HH:mm format.",
-                    timeField
-            );
-
-            return;
-        }
-
-    
+        // No time validation
+        // Time is automatically taken from LocalTime.now()
 
         // Check description
         if (description.isEmpty()) {
@@ -454,7 +427,6 @@ public class QuickAccidentReportFrame extends JFrame {
 
                 time,
 
-    
                 (String) locationBox.getSelectedItem(),
 
                 (String) typeBox.getSelectedItem(),
@@ -468,20 +440,20 @@ public class QuickAccidentReportFrame extends JFrame {
 
         // Save accident
         int accidentId =
-        saveAccident(accident);
+                saveAccident(accident);
 
         // Show success message
         JOptionPane.showMessageDialog(
-        this,
-        "Accident reported successfully.\n\n"
-                + "Accident ID: " + accidentId
-                + "\nType: " + accident.getAccidentType()
-                + "\nSeverity: " + accident.getSeverity()
-                + "\nLocation: " + accident.getLocation()
-                + "\n\nPlease remember your Accident ID.",
-        "Report Submitted",
-        JOptionPane.INFORMATION_MESSAGE
-);
+                this,
+                "Accident reported successfully.\n\n"
+                        + "Accident ID: " + accidentId
+                        + "\nType: " + accident.getAccidentType()
+                        + "\nSeverity: " + accident.getSeverity()
+                        + "\nLocation: " + accident.getLocation()
+                        + "\n\nPlease remember your Accident ID.",
+                "Report Submitted",
+                JOptionPane.INFORMATION_MESSAGE
+        );
 
         // Go back to home page
         goHome();
@@ -493,8 +465,8 @@ public class QuickAccidentReportFrame extends JFrame {
 
     private int saveAccident(Accident accident) {
 
-    return AccidentDAO.save(accident);
-}
+        return AccidentDAO.save(accident);
+    }
 
     // --------------------------------------------------
     // Display Error Message
@@ -506,13 +478,9 @@ public class QuickAccidentReportFrame extends JFrame {
     ) {
 
         JOptionPane.showMessageDialog(
-
                 this,
-
                 message,
-
                 "Check the form",
-
                 JOptionPane.WARNING_MESSAGE
         );
 

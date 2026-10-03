@@ -53,7 +53,7 @@ public class HomeFrame extends JFrame {
 
         // Emergency label
         JLabel emergencyLabel =
-                new JLabel("EMERGENCY RESPONSE");
+                new JLabel("");
 
 
         // Title
@@ -172,7 +172,7 @@ public class HomeFrame extends JFrame {
 
         JLabel footerLabel =
                 new JLabel(
-                        "24/7 Emergency Hotline Available");
+                        "Emergency response");
 
         panel.add(footerLabel);
 
