@@ -438,9 +438,7 @@ public class QuickAccidentReportFrame extends JFrame {
                 description
         );
 
-        // Save accident
-        int accidentId =
-                saveAccident(accident);
+        int accidentId = AccidentDAO.save(accident);
 
         // Show success message
         JOptionPane.showMessageDialog(
@@ -462,11 +460,6 @@ public class QuickAccidentReportFrame extends JFrame {
     // --------------------------------------------------
     // Save Accident
     // --------------------------------------------------
-
-    private int saveAccident(Accident accident) {
-
-        return AccidentDAO.save(accident);
-    }
 
     // --------------------------------------------------
     // Display Error Message

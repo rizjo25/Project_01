@@ -1,20 +1,16 @@
 package roadaccident.ui;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-// Main class
 public class HomeFrame extends JFrame {
 
-    // Buttons
     JButton loginButton;
     JButton registrationButton;
     JButton reportAccidentButton;
     JButton checkStatusButton;
     JButton exitButton;
 
-    // Constructor
     public HomeFrame() {
 
         // JFrame settings
