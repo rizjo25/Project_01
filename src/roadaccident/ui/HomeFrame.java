@@ -11,62 +11,55 @@ public class HomeFrame extends JFrame {
     JButton checkStatusButton;
     JButton exitButton;
 
+     public static void main(String[] args) {
+
+        HomeFrame frame =
+                new HomeFrame();
+
+        frame.setVisible(true);
+    }
+
     public HomeFrame() {
 
-        // JFrame settings
-        setTitle("Road Accident Management System");
+        setTitle("GROUP 17 PROJECT");
         setSize(480, 620);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-
-        // Create the home page
         createHomePage();
     }
 
-    // Create Home Page
     private void createHomePage() {
 
-        // Main layout
         setLayout(new BorderLayout());
 
-        // Add header
         add(createHeader(), BorderLayout.NORTH);
 
-        // Add buttons
         add(createButtonPanel(), BorderLayout.CENTER);
 
-        // Add footer
         add(createFooter(), BorderLayout.SOUTH);
     }
 
-    // Create Header
     private JPanel createHeader() {
 
         JPanel panel = new JPanel();
 
-        // Layout
         panel.setLayout(new GridLayout(4, 1));
-
-        // Emergency label
-        JLabel emergencyLabel =
+  
+        JLabel emptyLabel =
                 new JLabel("");
 
-
-        // Title
         JLabel titleLabel =
                 new JLabel("Road Accident");
 
         titleLabel.setHorizontalAlignment(
                 JLabel.CENTER);
 
-        // Title 2
         JLabel titleLabel2 =
                 new JLabel("Management System");
 
         titleLabel2.setHorizontalAlignment(
                 JLabel.CENTER);
 
-        // Subtitle
         JLabel subtitleLabel =
                 new JLabel(
                         "Report, track, and respond to accidents in real time");
@@ -74,8 +67,7 @@ public class HomeFrame extends JFrame {
         subtitleLabel.setHorizontalAlignment(
                 JLabel.CENTER);
 
-        // Add labels
-        panel.add(emergencyLabel);
+        panel.add(emptyLabel);
         panel.add(titleLabel);
         panel.add(titleLabel2);
         panel.add(subtitleLabel);
@@ -83,18 +75,15 @@ public class HomeFrame extends JFrame {
         return panel;
     }
 
-    // Create Button Panel
     private JPanel createButtonPanel() {
 
         JPanel panel = new JPanel();
 
-        // Grid layout
         panel.setLayout(
                 new GridLayout(5, 1, 7, 7));
         panel.setBorder(
         BorderFactory.createEmptyBorder(10, 30, 10, 30));
 
-        // Create buttons
         loginButton =
                 new JButton("Login");
 
@@ -110,14 +99,12 @@ public class HomeFrame extends JFrame {
         exitButton =
                 new JButton("Exit");
 
-        // Add buttons to panel
         panel.add(loginButton);
         panel.add(registrationButton);
         panel.add(reportAccidentButton);
         panel.add(checkStatusButton);
         panel.add(exitButton);
 
-        // Event handling
         loginButton.addActionListener(
                 new ActionListener() {
 
@@ -161,7 +148,6 @@ public class HomeFrame extends JFrame {
         return panel;
     }
 
-    // Create Footer
     private JPanel createFooter() {
 
         JPanel panel = new JPanel();
@@ -175,7 +161,6 @@ public class HomeFrame extends JFrame {
         return panel;
     }
 
-    // Login
     private void openLoginPage() {
 
         JOptionPane.showMessageDialog(
@@ -185,7 +170,6 @@ public class HomeFrame extends JFrame {
                 JOptionPane.INFORMATION_MESSAGE);
     }
 
-    // Registration
     private void openRegistrationPage() {
 
         JOptionPane.showMessageDialog(
@@ -195,7 +179,6 @@ public class HomeFrame extends JFrame {
                 JOptionPane.INFORMATION_MESSAGE);
     }
 
-    // Report Accident
     private void openReportAccidentPage() {
 
         new QuickAccidentReportFrame().setVisible(true);
@@ -203,18 +186,9 @@ public class HomeFrame extends JFrame {
         dispose();
     }
 
-    // Check Status
     private void openCheckStatusPage() {
 
        new CheckStatusFrame().setVisible(true);
     }
 
-    // Main method
-    public static void main(String[] args) {
-
-        HomeFrame frame =
-                new HomeFrame();
-
-        frame.setVisible(true);
-    }
 }
