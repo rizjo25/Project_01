@@ -14,6 +14,10 @@ import java.util.List;
 
 public class HospitalStaffFrame extends JFrame {
 
+    static {
+        AppTheme.applyTheme();
+    }
+
     private final User staffUser;
     private final HospitalStaffDAO hospitalDAO =
             new HospitalStaffDAO();

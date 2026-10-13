@@ -11,6 +11,12 @@ import java.util.Arrays;
 
 public class LoginFrame extends JFrame {
 
+    static {
+        AppTheme.applyTheme();
+    }
+
+    private final JFrame returnFrame;
+
     private final JTextField phoneField =
             new JTextField(20);
 
@@ -18,8 +24,13 @@ public class LoginFrame extends JFrame {
             new JPasswordField(20);
 
     public LoginFrame() {
+        this(null);
+    }
+
+    public LoginFrame(JFrame returnFrame) {
+        this.returnFrame = returnFrame;
         setTitle("Road Accident Management System - Login");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(460, 370);
         setLocationRelativeTo(null);
         setResizable(false);
@@ -112,18 +123,19 @@ public class LoginFrame extends JFrame {
         );
 
         phoneLabel.setAlignmentX(
-                Component.LEFT_ALIGNMENT
+                Component.CENTER_ALIGNMENT
         );
 
+        phoneField.setPreferredSize(new Dimension(300, 34));
         phoneField.setMaximumSize(
                 new Dimension(
-                        Integer.MAX_VALUE,
+                        300,
                         34
                 )
         );
 
         phoneField.setAlignmentX(
-                Component.LEFT_ALIGNMENT
+                Component.CENTER_ALIGNMENT
         );
 
         JLabel passwordLabel =
@@ -138,18 +150,19 @@ public class LoginFrame extends JFrame {
         );
 
         passwordLabel.setAlignmentX(
-                Component.LEFT_ALIGNMENT
+                Component.CENTER_ALIGNMENT
         );
 
+        passwordField.setPreferredSize(new Dimension(300, 34));
         passwordField.setMaximumSize(
                 new Dimension(
-                        Integer.MAX_VALUE,
+                        300,
                         34
                 )
         );
 
         passwordField.setAlignmentX(
-                Component.LEFT_ALIGNMENT
+                Component.CENTER_ALIGNMENT
         );
 
         JButton loginButton =
@@ -163,9 +176,7 @@ public class LoginFrame extends JFrame {
                 )
         );
 
-        loginButton.setBackground(
-                new Color(29, 105, 185)
-        );
+        loginButton.setBackground(new Color(37, 99, 180));
 
         loginButton.setForeground(Color.WHITE);
 
@@ -191,7 +202,7 @@ public class LoginFrame extends JFrame {
         );
 
         JButton homeButton =
-                new JButton("Back");
+                new JButton("Back to Home");
 
         homeButton.setFont(
                 new Font(
@@ -221,11 +232,17 @@ public class LoginFrame extends JFrame {
         });
 
         homeButton.addActionListener(e -> {
-            HomeFrame homeFrame = new HomeFrame();
-            homeFrame.setVisible(true);
+            if (returnFrame != null) {
+                returnFrame.setVisible(true);
+                returnFrame.toFront();
+            } else {
+                new HomeFrame().setVisible(true);
+            }
             dispose();
         });
 
+        formPanel.add(homeButton);
+        formPanel.add(Box.createVerticalStrut(10));
         formPanel.add(title);
         formPanel.add(Box.createVerticalStrut(6));
         formPanel.add(subtitle);
@@ -247,9 +264,6 @@ public class LoginFrame extends JFrame {
 
         formPanel.add(Box.createVerticalStrut(10));
         formPanel.add(registerButton);
-
-        formPanel.add(Box.createVerticalStrut(8));
-        formPanel.add(homeButton);
 
         mainPanel.add(
                 formPanel,

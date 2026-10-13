@@ -57,70 +57,34 @@ public class AccidentDAO {
 
 
     // Get accident using ID
-    public static Accident getAccidentById(int id) {
+    public static Accident getAccidentById(int id) throws SQLException {
 
         String sql =
                 "SELECT * FROM accident "
                 + "WHERE accident_id = ?";
 
-        try {
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, id);
 
-            Connection con =
-                    DatabaseConnection.getConnection();
-
-            PreparedStatement ps =
-                    con.prepareStatement(sql);
-
-            ps.setInt(1, id);
-
-            ResultSet rs =
-                    ps.executeQuery();
-
-            if (rs.next()) {
-
-                Accident accident =
-                        new Accident(
-
-                                rs.getInt("accident_id"),
-
-                                rs.getString("reporter_name"),
-
-                                rs.getString("reporter_phone"),
-
-                                rs.getString("accident_date"),
-
-                                rs.getString("accident_time"),
-
-                                rs.getString("location"),
-
-                                rs.getString("accident_type"),
-
-                                rs.getString("severity"),
-
-                                rs.getInt("victim_count"),
-
-                                rs.getString("description")
-                        );
-
-                rs.close();
-                ps.close();
-                con.close();
-
-                return accident;
+            try (ResultSet result = statement.executeQuery()) {
+                if (result.next()) {
+                    return new Accident(
+                            result.getInt("accident_id"),
+                            result.getString("reporter_name"),
+                            result.getString("reporter_phone"),
+                            result.getString("accident_date"),
+                            result.getString("accident_time"),
+                            result.getString("location"),
+                            result.getString("accident_type"),
+                            result.getString("severity"),
+                            result.getInt("victim_count"),
+                            result.getString("description"),
+                            result.getString("status")
+                    );
+                }
             }
-
-            rs.close();
-            ps.close();
-            con.close();
-
-        } catch (SQLException e) {
-
-            System.out.println(
-                    "Database error: "
-                    + e.getMessage()
-            );
         }
-
         return null;
     }
 }

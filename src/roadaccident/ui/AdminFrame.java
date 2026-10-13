@@ -15,6 +15,10 @@ import java.util.Locale;
 
 public class AdminFrame extends JFrame {
 
+    static {
+        AppTheme.applyTheme();
+    }
+
     private final JLabel pendingCountLabel =
             new JLabel("0", SwingConstants.CENTER);
 

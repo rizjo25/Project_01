@@ -15,6 +15,10 @@ import java.time.LocalTime;
 
 public class QuickAccidentReportFrame extends JFrame {
 
+    static {
+        AppTheme.applyTheme();
+    }
+
     // Location
     private static final String[] LOCATIONS = {
             "KOZHIKODE ZONE",

@@ -15,6 +15,10 @@ import java.util.List;
 
 public class PoliceFrame extends JFrame {
 
+    static {
+        AppTheme.applyTheme();
+    }
+
     private final User user;
     private final PoliceDashboardDAO dashboardDAO =
             new PoliceDashboardDAO();

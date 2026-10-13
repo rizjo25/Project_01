@@ -14,6 +14,10 @@ import java.util.List;
 
 public class AmbulanceDriverFrame extends JFrame {
 
+    static {
+        AppTheme.applyTheme();
+    }
+
     private final User user;
     private final AmbulanceDriverDAO driverDAO =
             new AmbulanceDriverDAO();

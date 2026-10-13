@@ -3,9 +3,21 @@ package roadaccident.ui;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.net.URL;
 
 // Main class
 public class HomeFrame extends JFrame {
+
+    static {
+        AppTheme.applyTheme();
+    }
+
+    private static final Color BACKGROUND =
+            new Color(245, 248, 252);
+    private static final Color NAVY =
+            new Color(27, 54, 93);
+    private static final Color BLUE =
+            new Color(37, 99, 180);
 
     // Buttons
     JButton loginButton;
@@ -19,9 +31,10 @@ public class HomeFrame extends JFrame {
 
         // JFrame settings
         setTitle("Road Accident Management System");
-        setSize(480, 620);
+        setSize(480, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+        getContentPane().setBackground(BACKGROUND);
 
         // Create the home page
         createHomePage();
@@ -36,8 +49,13 @@ public class HomeFrame extends JFrame {
         // Add header
         add(createHeader(), BorderLayout.NORTH);
 
-        // Add buttons
-        add(createButtonPanel(), BorderLayout.CENTER);
+        // Keep the button panel at its original size as the header grows.
+        JPanel buttonContainer = new JPanel(new GridBagLayout());
+        buttonContainer.setBackground(BACKGROUND);
+        JPanel buttonPanel = createButtonPanel();
+        buttonPanel.setPreferredSize(new Dimension(480, 410));
+        buttonContainer.add(buttonPanel);
+        add(buttonContainer, BorderLayout.CENTER);
 
         // Add footer
         add(createFooter(), BorderLayout.SOUTH);
@@ -47,14 +65,36 @@ public class HomeFrame extends JFrame {
     private JPanel createHeader() {
 
         JPanel panel = new JPanel();
+        panel.setBackground(NAVY);
+        panel.setBorder(
+                BorderFactory.createEmptyBorder(12, 12, 12, 12)
+        );
 
-        // Layout
-        panel.setLayout(new GridLayout(4, 1));
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        // Emergency label
-        JLabel emergencyLabel =
-                new JLabel("");
+        JLabel logoLabel = new JLabel();
+        logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        logoLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
+        URL logoResource = getClass().getResource(
+                "/roadaccident/resources/rams.png"
+        );
+        ImageIcon logoIcon = logoResource == null
+                ? new ImageIcon("src/roadaccident/resources/rams.png")
+                : new ImageIcon(logoResource);
+        if (logoIcon.getIconWidth() > 0) {
+            logoLabel.setIcon(new ImageIcon(
+                    logoIcon.getImage().getScaledInstance(
+                            120,
+                            120,
+                            Image.SCALE_SMOOTH
+                    )
+            ));
+        } else {
+            System.err.println(
+                    "Could not load src/roadaccident/resources/rams.png"
+            );
+        }
 
         // Title
         JLabel titleLabel =
@@ -62,6 +102,9 @@ public class HomeFrame extends JFrame {
 
         titleLabel.setHorizontalAlignment(
                 JLabel.CENTER);
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        titleLabel.setFont(new Font("SansSerif", Font.BOLD, 26));
+        titleLabel.setForeground(Color.WHITE);
 
         // Title 2
         JLabel titleLabel2 =
@@ -69,6 +112,9 @@ public class HomeFrame extends JFrame {
 
         titleLabel2.setHorizontalAlignment(
                 JLabel.CENTER);
+        titleLabel2.setAlignmentX(Component.CENTER_ALIGNMENT);
+        titleLabel2.setFont(new Font("SansSerif", Font.BOLD, 22));
+        titleLabel2.setForeground(Color.WHITE);
 
         // Subtitle
         JLabel subtitleLabel =
@@ -77,11 +123,16 @@ public class HomeFrame extends JFrame {
 
         subtitleLabel.setHorizontalAlignment(
                 JLabel.CENTER);
+        subtitleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        subtitleLabel.setForeground(new Color(225, 233, 243));
 
         // Add labels
-        panel.add(emergencyLabel);
+        panel.add(logoLabel);
+        panel.add(Box.createVerticalStrut(6));
         panel.add(titleLabel);
+        panel.add(Box.createVerticalStrut(3));
         panel.add(titleLabel2);
+        panel.add(Box.createVerticalStrut(3));
         panel.add(subtitleLabel);
 
         return panel;
@@ -91,12 +142,13 @@ public class HomeFrame extends JFrame {
     private JPanel createButtonPanel() {
 
         JPanel panel = new JPanel();
+        panel.setBackground(BACKGROUND);
 
         // Grid layout
         panel.setLayout(
                 new GridLayout(5, 1, 7, 7));
         panel.setBorder(
-        BorderFactory.createEmptyBorder(10, 30, 10, 30));
+        BorderFactory.createEmptyBorder(18, 30, 18, 30));
 
         // Create buttons
         loginButton =
@@ -113,6 +165,19 @@ public class HomeFrame extends JFrame {
 
         exitButton =
                 new JButton("Exit");
+
+        for (JButton button : new JButton[]{
+                loginButton,
+                registrationButton,
+                reportAccidentButton,
+                checkStatusButton,
+                exitButton
+        }) {
+            button.setBackground(BLUE);
+            button.setForeground(Color.WHITE);
+            button.setFocusPainted(false);
+            button.setFont(new Font("SansSerif", Font.PLAIN, 35));
+        }
 
         // Add buttons to panel
         panel.add(loginButton);
@@ -169,10 +234,12 @@ public class HomeFrame extends JFrame {
     private JPanel createFooter() {
 
         JPanel panel = new JPanel();
+        panel.setBackground(BACKGROUND);
 
         JLabel footerLabel =
                 new JLabel(
                         "Emergency response");
+        footerLabel.setForeground(new Color(90, 100, 115));
 
         panel.add(footerLabel);
 
@@ -182,9 +249,9 @@ public class HomeFrame extends JFrame {
     // Login
     private void openLoginPage() {
 
-        LoginFrame loginFrame = new LoginFrame();
+        setVisible(false);
+        LoginFrame loginFrame = new LoginFrame(this);
         loginFrame.setVisible(true);
-        dispose();
     }
 
     // Registration
@@ -205,8 +272,8 @@ public class HomeFrame extends JFrame {
 
     // Check Status
     private void openCheckStatusPage() {
-
-       new CheckStatusFrame().setVisible(true);
+        setVisible(false);
+        new CheckStatusFrame(this).setVisible(true);
     }
 
     // Main method

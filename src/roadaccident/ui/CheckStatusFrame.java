@@ -1,203 +1,165 @@
 package roadaccident.ui;
 
-import roadaccident.dao.AccidentDAO;
-import roadaccident.model.Accident;
+import roadaccident.dao.PoliceDashboardDAO;
+import roadaccident.model.TimelineEvent;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.sql.SQLException;
 
 public class CheckStatusFrame extends JFrame {
 
-    private JTextField idField;
+    static {
+        AppTheme.applyTheme();
+    }
 
-    private JLabel resultLabel;
+    private final JFrame returnFrame;
+    private final JTextField idField = new JTextField(12);
+    private final JTextArea timelineArea = createTextArea();
+    private final PoliceDashboardDAO policeDashboardDAO =
+            new PoliceDashboardDAO();
 
     public CheckStatusFrame() {
+        this(null);
+    }
+
+    public CheckStatusFrame(JFrame returnFrame) {
+        this.returnFrame = returnFrame;
 
         setTitle("Check Accident Status");
-
-        setSize(500, 500);
-
-        setDefaultCloseOperation(
-                JFrame.EXIT_ON_CLOSE
-        );
-
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setSize(760, 650);
+        setMinimumSize(new Dimension(620, 520));
         setLocationRelativeTo(null);
 
-        setLayout(new BorderLayout());
+        buildUI();
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosed(java.awt.event.WindowEvent event) {
+                showReturnFrame();
+            }
+        });
+    }
 
-        // -----------------------------
-        // Title
-        // -----------------------------
+    private void buildUI() {
+        JPanel mainPanel = new JPanel(new BorderLayout(12, 12));
+        mainPanel.setBorder(new EmptyBorder(16, 18, 16, 18));
 
-        JLabel title =
-                new JLabel("Check Accident Status");
+        JButton backButton = new JButton("Back");
+        backButton.addActionListener(event -> dispose());
 
-        title.setFont(
-                new Font("Arial", Font.BOLD, 24)
+        JLabel title = new JLabel(
+                "Check Accident Status",
+                SwingConstants.CENTER
+        );
+        title.setFont(new Font("SansSerif", Font.BOLD, 22));
+        JPanel header = new JPanel(new BorderLayout());
+        header.add(backButton, BorderLayout.WEST);
+        header.add(title, BorderLayout.CENTER);
+        mainPanel.add(header, BorderLayout.NORTH);
+
+        JPanel content = new JPanel(new BorderLayout(10, 10));
+        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 8));
+        searchPanel.add(new JLabel("Accident ID:"));
+        searchPanel.add(idField);
+
+        JButton checkButton = new JButton("Check Status");
+        checkButton.addActionListener(event -> checkStatus());
+        idField.addActionListener(event -> checkStatus());
+        searchPanel.add(checkButton);
+        content.add(searchPanel, BorderLayout.NORTH);
+
+        JScrollPane timelineScroll = new JScrollPane(timelineArea);
+        timelineScroll.setBorder(
+                BorderFactory.createTitledBorder("Incident Timeline")
+        );
+        timelineScroll.setHorizontalScrollBarPolicy(
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
         );
 
-        title.setHorizontalAlignment(
-                JLabel.CENTER
-        );
+        content.add(timelineScroll, BorderLayout.CENTER);
 
-        add(title, BorderLayout.NORTH);
+        mainPanel.add(content, BorderLayout.CENTER);
+        setContentPane(mainPanel);
+    }
 
-        // -----------------------------
-        // Input Panel
-        // -----------------------------
+    private static JTextArea createTextArea() {
+        JTextArea textArea = new JTextArea();
+        textArea.setEditable(false);
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+        textArea.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        textArea.setBorder(new EmptyBorder(8, 8, 8, 8));
+        return textArea;
+    }
 
-        JPanel inputPanel = new JPanel();
+    private void checkStatus() {
+        String idText = idField.getText().trim();
+        if (idText.isEmpty()) {
+            showWarning("Enter an accident ID.");
+            return;
+        }
 
-        inputPanel.setLayout(
-                new FlowLayout()
-        );
+        int accidentId;
+        try {
+            accidentId = Integer.parseInt(idText);
+            if (accidentId <= 0) {
+                showWarning("Accident ID must be a positive number.");
+                return;
+            }
+        } catch (NumberFormatException exception) {
+            showWarning("Accident ID must be a number.");
+            return;
+        }
 
-        JLabel idLabel =
-                new JLabel("Accident ID:");
+        timelineArea.setText("");
+        try {
+            showTimeline(accidentId);
+        } catch (SQLException exception) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Could not load accident status.\n" + exception.getMessage(),
+                    "Database Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+            exception.printStackTrace();
+        }
+    }
 
-        idField =
-                new JTextField(10);
+    private void showTimeline(int accidentId) throws SQLException {
+        StringBuilder timeline = new StringBuilder();
+        for (TimelineEvent event : policeDashboardDAO.getTimeline(accidentId)) {
+            if (timeline.length() > 0) {
+                timeline.append("\n\n");
+            }
+            timeline.append(event);
+        }
 
-        JButton checkButton =
-                new JButton("Check Status");
+        if (timeline.length() == 0) {
+            timeline.append("No accident found for ID ACC-")
+                    .append(accidentId)
+                    .append('.');
+        }
+        timelineArea.setText(timeline.toString());
+        timelineArea.setCaretPosition(0);
+    }
 
-        inputPanel.add(idLabel);
-        inputPanel.add(idField);
-        inputPanel.add(checkButton);
-
-        add(
-                inputPanel,
-                BorderLayout.CENTER
-        );
-
-        // -----------------------------
-        // Result
-        // -----------------------------
-
-        resultLabel =
-                new JLabel();
-
-        resultLabel.setVerticalAlignment(
-                JLabel.TOP
-        );
-
-        resultLabel.setBorder(
-                BorderFactory.createEmptyBorder(
-                        20, 30, 20, 30
-                )
-        );
-
-        add(
-                resultLabel,
-                BorderLayout.SOUTH
-        );
-
-        // -----------------------------
-        // Button Event
-        // -----------------------------
-
-        checkButton.addActionListener(
-                new ActionListener() {
-
-                    @Override
-                    public void actionPerformed(
-                            ActionEvent e) {
-
-                        checkStatus();
-                    }
-                }
+    private void showWarning(String message) {
+        JOptionPane.showMessageDialog(
+                this,
+                message,
+                "Check Accident Status",
+                JOptionPane.WARNING_MESSAGE
         );
     }
 
-    // Check accident status
-    private void checkStatus() {
-
-        String idText =
-                idField.getText().trim();
-
-        // Check empty input
-        if (idText.isEmpty()) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Please enter Accident ID.",
-                    "Error",
-                    JOptionPane.WARNING_MESSAGE
-            );
-
-            return;
+    private void showReturnFrame() {
+        if (returnFrame != null) {
+            returnFrame.setVisible(true);
+            returnFrame.toFront();
+        } else {
+            new HomeFrame().setVisible(true);
         }
-
-        int id;
-
-        // Convert String to int
-        try {
-
-            id = Integer.parseInt(idText);
-
-        } catch (NumberFormatException e) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Accident ID must be a number.",
-                    "Error",
-                    JOptionPane.WARNING_MESSAGE
-            );
-
-            return;
-        }
-
-        // Get accident from database
-        Accident accident =
-                AccidentDAO.getAccidentById(id);
-
-        // If no accident found
-        if (accident == null) {
-
-            resultLabel.setText(
-                    "<html>"
-                    + "<h3>No accident found.</h3>"
-                    + "Please check the Accident ID."
-                    + "</html>"
-            );
-
-            return;
-        }
-
-        // Display accident details
-        resultLabel.setText(
-                "<html>"
-                + "<h3>Accident Found</h3>"
-                + "<b>Accident ID:</b> "
-                + accident.getId()
-                + "<br>"
-                + "<b>Name:</b> "
-                + accident.getName()
-                + "<br>"
-                + "<b>Date:</b> "
-                + accident.getDate()
-                + "<br>"
-                + "<b>Time:</b> "
-                + accident.getTime()
-                + "<br>"
-                + "<b>Location:</b> "
-                + accident.getLocation()
-                + "<br>"
-                + "<b>Type:</b> "
-                + accident.getAccidentType()
-                + "<br>"
-                + "<b>Severity:</b> "
-                + accident.getSeverity()
-                + "<br>"
-                + "<b>Victims:</b> "
-                + accident.getNumberOfVictims()
-                + "<br>"
-                + "<b>Description:</b> "
-                + accident.getDescription()
-                + "</html>"
-        );
     }
 }

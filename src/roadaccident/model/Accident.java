@@ -12,6 +12,7 @@ public class Accident {
     private String severity;
     private int numberOfVictims;
     private String description;
+    private String status;
 
     // Constructor used when creating a new accident
     public Accident(
@@ -47,7 +48,8 @@ public class Accident {
             String accidentType,
             String severity,
             int numberOfVictims,
-            String description) {
+            String description,
+            String status) {
 
         this.id = id;
         this.name = name;
@@ -59,6 +61,7 @@ public class Accident {
         this.severity = severity;
         this.numberOfVictims = numberOfVictims;
         this.description = description;
+        this.status = status;
     }
 
     public int getId() {
@@ -99,5 +102,9 @@ public class Accident {
 
     public String getDescription() {
         return description;
+    }
+
+    public String getStatus() {
+        return status;
     }
 }

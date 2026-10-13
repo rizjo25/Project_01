@@ -10,6 +10,10 @@ import java.sql.SQLException;
 
 public class RegisterFrame extends JFrame {
 
+    static {
+        AppTheme.applyTheme();
+    }
+
     private final JTextField nameField = new JTextField(20);
     private final JTextField phoneField = new JTextField(20);
     private final JPasswordField passwordField = new JPasswordField(20);
@@ -57,7 +61,7 @@ public class RegisterFrame extends JFrame {
 
         JLabel title = new JLabel("Create an Account");
         title.setFont(new Font("SansSerif", Font.BOLD, 24));
-        title.setAlignmentX(Component.LEFT_ALIGNMENT);
+        title.setAlignmentX(Component.CENTER_ALIGNMENT);
         form.add(title);
         form.add(Box.createVerticalStrut(18));
 
@@ -76,7 +80,7 @@ public class RegisterFrame extends JFrame {
         JCheckBox consent = new JCheckBox(
                 "I confirm that the information is correct."
         );
-        consent.setAlignmentX(Component.LEFT_ALIGNMENT);
+        consent.setAlignmentX(Component.CENTER_ALIGNMENT);
         form.add(Box.createVerticalStrut(12));
         form.add(consent);
 
@@ -172,9 +176,10 @@ registerButton.addActionListener(e -> {
             JComponent input) {
 
         JLabel fieldLabel = new JLabel(label);
-        fieldLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        input.setMaximumSize(new Dimension(Integer.MAX_VALUE, 32));
-        input.setAlignmentX(Component.LEFT_ALIGNMENT);
+        fieldLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        input.setPreferredSize(new Dimension(340, 32));
+        input.setMaximumSize(new Dimension(340, 32));
+        input.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         panel.add(fieldLabel);
         panel.add(Box.createVerticalStrut(4));
@@ -184,19 +189,23 @@ registerButton.addActionListener(e -> {
 
     private void makeRolePanels() {
         JPanel empty = new JPanel();
+        empty.setBackground(new Color(245, 248, 252));
 
         JPanel driver = new JPanel();
         driver.setLayout(new BoxLayout(driver, BoxLayout.Y_AXIS));
+        driver.setBackground(new Color(245, 248, 252));
         addField(driver, "Driving Licence Number", licenceField);
         addField(driver, "Ambulance Number", ambulanceField);
 
         JPanel hospital = new JPanel();
         hospital.setLayout(new BoxLayout(hospital, BoxLayout.Y_AXIS));
+        hospital.setBackground(new Color(245, 248, 252));
         addField(hospital, "Hospital Name", hospitalField);
         addField(hospital, "Designation", designationField);
 
         JPanel police = new JPanel();
         police.setLayout(new BoxLayout(police, BoxLayout.Y_AXIS));
+        police.setBackground(new Color(245, 248, 252));
         addField(police, "Police Station", stationField);
         addField(police, "Badge / Police ID", badgeField);
 
@@ -204,6 +213,9 @@ registerButton.addActionListener(e -> {
         rolePanel.add(driver, "Ambulance Driver");
         rolePanel.add(hospital, "Hospital Staff");
         rolePanel.add(police, "Police");
+        rolePanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        rolePanel.setPreferredSize(new Dimension(360, 150));
+        rolePanel.setMaximumSize(new Dimension(360, 150));
     }
 
     private void showRolePanel() {
