@@ -182,21 +182,17 @@ public class HomeFrame extends JFrame {
     // Login
     private void openLoginPage() {
 
-        JOptionPane.showMessageDialog(
-                this,
-                "Login page will open here.",
-                "Coming Soon",
-                JOptionPane.INFORMATION_MESSAGE);
+        LoginFrame loginFrame = new LoginFrame();
+        loginFrame.setVisible(true);
+        dispose();
     }
 
     // Registration
     private void openRegistrationPage() {
 
-        JOptionPane.showMessageDialog(
-                this,
-                "Registration page will open here.",
-                "Coming Soon",
-                JOptionPane.INFORMATION_MESSAGE);
+        new RegisterFrame().setVisible(true);
+
+        dispose();
     }
 
     // Report Accident

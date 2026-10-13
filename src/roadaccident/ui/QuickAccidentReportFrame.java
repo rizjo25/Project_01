@@ -9,6 +9,7 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -17,8 +18,8 @@ public class QuickAccidentReportFrame extends JFrame {
     // Location
     private static final String[] LOCATIONS = {
             "KOZHIKODE ZONE",
-            "WESTHIL ZONE",
-            "EASTHIL ZONE"
+            "WESTHILL ZONE",
+            "EASTHILL ZONE"
     };
 
     // Accident types
@@ -439,8 +440,19 @@ public class QuickAccidentReportFrame extends JFrame {
         );
 
         // Save accident
-        int accidentId =
-                saveAccident(accident);
+        int accidentId;
+        try {
+            accidentId = saveAccident(accident);
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "The accident report could not be saved.\n"
+                            + ex.getMessage(),
+                    "Report Submission Failed",
+                    JOptionPane.ERROR_MESSAGE
+            );
+            return;
+        }
 
         // Show success message
         JOptionPane.showMessageDialog(
@@ -463,7 +475,7 @@ public class QuickAccidentReportFrame extends JFrame {
     // Save Accident
     // --------------------------------------------------
 
-    private int saveAccident(Accident accident) {
+    private int saveAccident(Accident accident) throws SQLException {
 
         return AccidentDAO.save(accident);
     }

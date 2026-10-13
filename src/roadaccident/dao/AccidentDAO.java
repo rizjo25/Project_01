@@ -12,7 +12,7 @@ import java.sql.Statement;
 public class AccidentDAO {
 
     // Save accident
-    public static int save(Accident accident) {
+    public static int save(Accident accident) throws SQLException {
 
         String sql =
                 "INSERT INTO accident "
@@ -21,16 +21,11 @@ public class AccidentDAO {
                 + "victim_count, description, status) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try {
-
-            Connection con =
-                    DatabaseConnection.getConnection();
-
-            PreparedStatement ps =
-                    con.prepareStatement(
-                            sql,
-                            Statement.RETURN_GENERATED_KEYS
-                    );
+        try (Connection con = DatabaseConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(
+                     sql,
+                     Statement.RETURN_GENERATED_KEYS
+             )) {
 
             ps.setString(1, accident.getName());
             ps.setString(2, accident.getPhone());
@@ -48,34 +43,16 @@ public class AccidentDAO {
             ps.executeUpdate();
 
             // Get generated accident ID
-            ResultSet rs =
-                    ps.getGeneratedKeys();
-
-            if (rs.next()) {
-
-                int accidentId =
-                        rs.getInt(1);
-
-                rs.close();
-                ps.close();
-                con.close();
-
-                return accidentId;
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
             }
-
-            rs.close();
-            ps.close();
-            con.close();
-
-        } catch (SQLException e) {
-
-            System.out.println(
-                    "Database error: "
-                    + e.getMessage()
-            );
         }
 
-        return -1;
+        throw new SQLException(
+                "The accident report was inserted, but no generated ID was returned."
+        );
     }
 
 
