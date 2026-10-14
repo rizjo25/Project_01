@@ -5,7 +5,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.net.URL;
 
-// Main class
 public class HomeFrame extends JFrame {
 
     static {
