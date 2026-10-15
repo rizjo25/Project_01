@@ -10,12 +10,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class PoliceDashboardDAO {
 
     public List<PoliceIncident> getIncidentsByZone(String zone)
             throws SQLException {
+        if (zone == null || zone.isBlank()) {
+            throw new IllegalArgumentException(
+                    "The police account does not have a zone."
+            );
+        }
+
         String sql = """
             SELECT
                 a.accident_id,
@@ -49,7 +54,7 @@ public class PoliceDashboardDAO {
         List<PoliceIncident> incidents = new ArrayList<>();
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, normalizeZone(zone) + " ZONE");
+            statement.setString(1, zone.trim() + " ZONE");
 
             try (ResultSet result = statement.executeQuery()) {
                 while (result.next()) {
@@ -186,21 +191,4 @@ public class PoliceDashboardDAO {
         }
     }
 
-    private String normalizeZone(String zone) {
-        if (zone == null || zone.isBlank()) {
-            throw new IllegalArgumentException(
-                    "The police account does not have a zone."
-            );
-        }
-        String normalized = zone.trim()
-                .toUpperCase(Locale.ROOT)
-                .replace('_', ' ');
-        if (normalized.endsWith(" ZONE")) {
-            normalized = normalized.substring(
-                    0,
-                    normalized.length() - " ZONE".length()
-            ).trim();
-        }
-        return normalized;
-    }
 }

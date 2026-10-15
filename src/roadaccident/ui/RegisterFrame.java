@@ -46,10 +46,6 @@ public class RegisterFrame extends JFrame {
     private final JTextField badgeField = new JTextField(20);
 
     public RegisterFrame() {
-        this(null);
-    }
-
-    public RegisterFrame(JFrame returnFrame) {
         setTitle("New Registration");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(520, 720);
@@ -148,12 +144,7 @@ registerButton.addActionListener(e -> {
         JButton backButton = new JButton("Back");
         backButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         backButton.addActionListener(e -> {
-            if (returnFrame != null) {
-                returnFrame.setVisible(true);
-                returnFrame.toFront();
-            } else {
-                new HomeFrame().setVisible(true);
-            }
+            new HomeFrame().setVisible(true);
             dispose();
         });
 

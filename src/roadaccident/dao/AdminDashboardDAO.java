@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Locale;
 
 public class AdminDashboardDAO {
 
@@ -43,7 +44,7 @@ public class AdminDashboardDAO {
         String sql = """
             SELECT COUNT(*) AS total
             FROM users
-            WHERE role = ?
+            WHERE UPPER(REPLACE(role, ' ', '_')) = ?
             AND verification_status = 'APPROVED'
             """;
 
@@ -52,7 +53,7 @@ public class AdminDashboardDAO {
              PreparedStatement statement =
                      connection.prepareStatement(sql)) {
 
-            statement.setString(1, role);
+            statement.setString(1, normalizeRole(role));
 
             try (ResultSet result =
                          statement.executeQuery()) {
@@ -114,14 +115,22 @@ public class AdminDashboardDAO {
                 created_at
             FROM users
             WHERE verification_status = 'APPROVED'
-            AND role = ?
+            AND UPPER(REPLACE(role, ' ', '_')) = ?
             ORDER BY full_name ASC
             """;
 
         PreparedStatement statement =
                 connection.prepareStatement(sql);
-        statement.setString(1, role);
+        statement.setString(1, normalizeRole(role));
         return statement.executeQuery();
+    }
+
+    private String normalizeRole(String role) {
+        return role == null
+                ? null
+                : role.trim()
+                        .toUpperCase(Locale.ROOT)
+                        .replace(' ', '_');
     }
 
     public boolean updateRegistrationStatus(

@@ -8,7 +8,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Locale;
 
 public class RegistrationDAO {
 
@@ -80,11 +79,7 @@ public class RegistrationDAO {
              PreparedStatement statement =
                      connection.prepareStatement(sql)) {
 
-            /*
-             * For a classroom prototype this line uses the password
-             * from the model. Replace it with a real hashing method
-             * before using the application with real users.
-             */
+           
             String passwordHash =
                     registration.getPassword();
 
@@ -105,16 +100,12 @@ public class RegistrationDAO {
 
             statement.setString(
                     4,
-                    convertRole(
-                            registration.getRole()
-                    )
+                    registration.getRole()
             );
 
             statement.setString(
                     5,
-                    convertZone(
-                            registration.getZone()
-                    )
+                    registration.getZone()
             );
 
             statement.setString(
@@ -185,41 +176,6 @@ public class RegistrationDAO {
         return normalizeText(value);
     }
 
-    private String convertRole(String role) {
-        String normalizedRole = normalizeText(role);
-        if (normalizedRole == null) {
-            return null;
-        }
-
-        switch (normalizedRole.toLowerCase(Locale.ROOT)) {
-            case "ambulance driver":
-                return "AMBULANCE_DRIVER";
-            case "hospital staff":
-                return "HOSPITAL_STAFF";
-            case "police":
-                return "POLICE";
-            default:
-                return normalizedRole;
-        }
-    }
-
-    private String convertZone(String zone) {
-        String normalizedZone = normalizeText(zone);
-        if (normalizedZone == null) {
-            return null;
-        }
-
-        switch (normalizedZone.toLowerCase(Locale.ROOT)) {
-            case "kozhikode":
-                return "KOZHIKODE";
-            case "westhill":
-                return "WESTHILL";
-            case "easthill":
-                return "EASTHILL";
-            default:
-                return normalizedZone;
-        }
-    }
     public User login(
         String phoneNumber,
         String password) throws SQLException {
@@ -256,14 +212,7 @@ public class RegistrationDAO {
             String storedPassword =
                     result.getString("password_hash");
 
-            /*
-             * Current classroom prototype:
-             * compares the entered password with the test password
-             * stored in the database.
-             *
-             * Final version:
-             * replace with BCrypt / Argon2 password verification.
-             */
+        
             if (!password.equals(storedPassword)) {
                 return null;
             }

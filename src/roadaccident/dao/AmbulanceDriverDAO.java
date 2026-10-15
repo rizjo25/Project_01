@@ -11,17 +11,20 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class AmbulanceDriverDAO {
 
     public List<AccidentAlert> getAccidentsByZone(
             String zone) throws SQLException {
 
+        if (zone == null || zone.isBlank()) {
+            throw new IllegalArgumentException(
+                    "A zone is required to load accident reports."
+            );
+        }
+
         List<AccidentAlert> accidents =
                 new ArrayList<>();
-
-        String normalizedZone = normalizeZone(zone);
 
         String sql = """
             SELECT
@@ -45,7 +48,7 @@ public class AmbulanceDriverDAO {
              PreparedStatement statement =
                      connection.prepareStatement(sql)) {
 
-            statement.setString(1, normalizedZone + " ZONE");
+            statement.setString(1, zone.trim() + " ZONE");
 
             try (ResultSet result =
                          statement.executeQuery()) {
@@ -62,7 +65,7 @@ public class AmbulanceDriverDAO {
                                     result.getString(
                                             "reporter_phone"
                                     ),
-                                    normalizedZone,
+                                    zone.trim(),
                                     result.getString(
                                             "severity"
                                     ),
@@ -87,29 +90,14 @@ public class AmbulanceDriverDAO {
         return accidents;
     }
 
-    private String normalizeZone(String zone) {
-        if (zone == null || zone.isBlank()) {
-            throw new IllegalArgumentException(
-                    "A zone is required to load accident reports."
-            );
-        }
-
-        String normalizedZone = zone.trim()
-                .toUpperCase(Locale.ROOT)
-                .replace('_', ' ');
-
-        if (normalizedZone.endsWith(" ZONE")) {
-            normalizedZone = normalizedZone.substring(
-                    0,
-                    normalizedZone.length() - " ZONE".length()
-            ).trim();
-        }
-
-        return normalizedZone;
-    }
-
     public List<Hospital> getHospitalsByZone(
             String zone) throws SQLException {
+
+        if (zone == null || zone.isBlank()) {
+            throw new IllegalArgumentException(
+                    "A zone is required to load hospitals."
+            );
+        }
 
         List<Hospital> hospitals =
                 new ArrayList<>();
@@ -133,7 +121,7 @@ public class AmbulanceDriverDAO {
              PreparedStatement statement =
                      connection.prepareStatement(sql)) {
 
-            statement.setString(1, normalizeZone(zone));
+            statement.setString(1, zone.trim());
 
             try (ResultSet result =
                          statement.executeQuery()) {
@@ -288,8 +276,9 @@ public class AmbulanceDriverDAO {
                     );
                 }
 
-                if (!normalizeZone(accidentLocation)
-                        .equals(normalizeZone(hospitalZone))) {
+                if (!accidentLocation.trim().equalsIgnoreCase(
+                        hospitalZone.trim() + " ZONE"
+                )) {
                     throw new SQLException(
                             "Select a hospital in the accident's zone."
                     );

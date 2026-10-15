@@ -15,8 +15,6 @@ public class LoginFrame extends JFrame {
         AppTheme.applyTheme();
     }
 
-    private final JFrame returnFrame;
-
     private final JTextField phoneField =
             new JTextField(20);
 
@@ -24,11 +22,6 @@ public class LoginFrame extends JFrame {
             new JPasswordField(20);
 
     public LoginFrame() {
-        this(null);
-    }
-
-    public LoginFrame(JFrame returnFrame) {
-        this.returnFrame = returnFrame;
         setTitle("Road Accident Management System - Login");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(460, 370);
@@ -225,19 +218,12 @@ public class LoginFrame extends JFrame {
         );
 
         registerButton.addActionListener(e -> {
-            RegisterFrame registerFrame =
-                    new RegisterFrame(this);
-
-            registerFrame.setVisible(true);
+            new RegisterFrame().setVisible(true);
+            dispose();
         });
 
         homeButton.addActionListener(e -> {
-            if (returnFrame != null) {
-                returnFrame.setVisible(true);
-                returnFrame.toFront();
-            } else {
-                new HomeFrame().setVisible(true);
-            }
+            new HomeFrame().setVisible(true);
             dispose();
         });
 

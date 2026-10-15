@@ -18,11 +18,11 @@ public class AmbulanceDriverFrame extends JFrame {
         AppTheme.applyTheme();
     }
 
-    private final User user;
-    private final AmbulanceDriverDAO driverDAO =
+    private final User driverUser;
+    private final AmbulanceDriverDAO ambulanceDriverDAO =
             new AmbulanceDriverDAO();
 
-    private final DefaultTableModel accidentTableModel =
+    private final DefaultTableModel accidentReportsTableModel =
             new DefaultTableModel(
                     new String[]{
                             "Accident ID",
@@ -37,12 +37,15 @@ public class AmbulanceDriverFrame extends JFrame {
                     0
             ) {
                 @Override
-                public boolean isCellEditable(int row, int column) {
+                public boolean isCellEditable(
+                        int modelRowIndex,
+                        int modelColumnIndex
+                ) {
                     return false;
                 }
             };
 
-    private final DefaultTableModel hospitalTableModel =
+    private final DefaultTableModel availableHospitalsTableModel =
             new DefaultTableModel(
                     new String[]{
                             "Hospital ID",
@@ -54,18 +57,21 @@ public class AmbulanceDriverFrame extends JFrame {
                     0
             ) {
                 @Override
-                public boolean isCellEditable(int row, int column) {
+                public boolean isCellEditable(
+                        int modelRowIndex,
+                        int modelColumnIndex
+                ) {
                     return false;
                 }
             };
 
-    private final JTable accidentTable =
-            new JTable(accidentTableModel);
-    private final JTable hospitalTable =
-            new JTable(hospitalTableModel);
+    private final JTable accidentReportsTable =
+            new JTable(accidentReportsTableModel);
+    private final JTable availableHospitalsTable =
+            new JTable(availableHospitalsTableModel);
 
-    public AmbulanceDriverFrame(User user) {
-        this.user = user;
+    public AmbulanceDriverFrame(User authenticatedDriver) {
+        this.driverUser = authenticatedDriver;
 
         setTitle("Ambulance Driver Dashboard");
         setSize(1100, 720);
@@ -73,115 +79,131 @@ public class AmbulanceDriverFrame extends JFrame {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        JPanel panel = new JPanel(new BorderLayout(16, 16));
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 24, 20, 24));
+        JPanel dashboardPanel = new JPanel(new BorderLayout(16, 16));
+        dashboardPanel.setBorder(
+                BorderFactory.createEmptyBorder(20, 24, 20, 24)
+        );
 
-        JLabel welcomeLabel = new JLabel(
-                "Welcome " + user.getFullName()
-                        + " | Zone: " + user.getZone(),
+        JLabel welcomeMessageLabel = new JLabel(
+                "Welcome " + driverUser.getFullName()
+                        + " | Zone: " + driverUser.getZone(),
                 SwingConstants.LEFT
         );
 
-        JButton refreshButton = new JButton("Refresh");
-        refreshButton.addActionListener(e -> refreshDashboard());
+        JButton refreshDashboardButton = new JButton("Refresh");
+        refreshDashboardButton.addActionListener(
+                e -> refreshDashboard()
+        );
 
-        JButton logoutButton = new JButton("Logout");
-        logoutButton.addActionListener(e -> logoutToHome());
+        JButton logoutDashboardButton = new JButton("Logout");
+        logoutDashboardButton.addActionListener(e -> logoutToHome());
 
-        JPanel header = new JPanel(new BorderLayout(12, 0));
-        header.add(welcomeLabel, BorderLayout.CENTER);
+        JPanel dashboardHeader = new JPanel(new BorderLayout(12, 0));
+        dashboardHeader.add(welcomeMessageLabel, BorderLayout.CENTER);
 
-        JPanel headerButtons =
+        JPanel dashboardHeaderActions =
                 new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
-        headerButtons.add(refreshButton);
-        headerButtons.add(logoutButton);
-        header.add(headerButtons, BorderLayout.EAST);
+        dashboardHeaderActions.add(refreshDashboardButton);
+        dashboardHeaderActions.add(logoutDashboardButton);
+        dashboardHeader.add(dashboardHeaderActions, BorderLayout.EAST);
 
-        accidentTable.setRowHeight(26);
-        accidentTable.setAutoCreateRowSorter(true);
-        TableLayout.wrapCellsAndFitRows(accidentTable);
-        JScrollPane accidentsPane = new JScrollPane(accidentTable);
-        accidentsPane.setHorizontalScrollBarPolicy(
+        accidentReportsTable.setRowHeight(26);
+        accidentReportsTable.setAutoCreateRowSorter(true);
+        TableLayout.wrapCellsAndFitRows(accidentReportsTable);
+        JScrollPane accidentReportsScrollPane =
+                new JScrollPane(accidentReportsTable);
+        accidentReportsScrollPane.setHorizontalScrollBarPolicy(
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
         );
-        accidentsPane.setBorder(BorderFactory.createTitledBorder(
-                "Accident Reports in Your Zone"
-        ));
+        accidentReportsScrollPane.setBorder(
+                BorderFactory.createTitledBorder(
+                        "Accident Reports in Your Zone"
+                )
+        );
 
-        hospitalTable.setRowHeight(26);
-        hospitalTable.setAutoCreateRowSorter(true);
-        hospitalTable.getColumnModel().getColumn(0).setMinWidth(0);
-        hospitalTable.getColumnModel().getColumn(0).setMaxWidth(0);
-        hospitalTable.getColumnModel().getColumn(0).setPreferredWidth(0);
-        TableLayout.wrapCellsAndFitRows(hospitalTable);
-        JScrollPane hospitalsPane = new JScrollPane(hospitalTable);
-        hospitalsPane.setHorizontalScrollBarPolicy(
+        availableHospitalsTable.setRowHeight(26);
+        availableHospitalsTable.setAutoCreateRowSorter(true);
+        availableHospitalsTable.getColumnModel().getColumn(0).setMinWidth(0);
+        availableHospitalsTable.getColumnModel().getColumn(0).setMaxWidth(0);
+        availableHospitalsTable.getColumnModel().getColumn(0)
+                .setPreferredWidth(0);
+        TableLayout.wrapCellsAndFitRows(availableHospitalsTable);
+        JScrollPane availableHospitalsScrollPane =
+                new JScrollPane(availableHospitalsTable);
+        availableHospitalsScrollPane.setHorizontalScrollBarPolicy(
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
         );
-        hospitalsPane.setBorder(BorderFactory.createTitledBorder(
-                "Hospitals with Available Beds in Your Zone"
-        ));
+        availableHospitalsScrollPane.setBorder(
+                BorderFactory.createTitledBorder(
+                        "Hospitals with Available Beds in Your Zone"
+                )
+        );
 
-        JSplitPane dataSplitPane = new JSplitPane(
+        JSplitPane dashboardDataSplitPane = new JSplitPane(
                 JSplitPane.VERTICAL_SPLIT,
-                accidentsPane,
-                hospitalsPane
+                accidentReportsScrollPane,
+                availableHospitalsScrollPane
         );
-        dataSplitPane.setResizeWeight(0.58);
-        dataSplitPane.setContinuousLayout(true);
+        dashboardDataSplitPane.setResizeWeight(0.58);
+        dashboardDataSplitPane.setContinuousLayout(true);
 
-        JButton pickupButton =
+        JButton pickupVictimButton =
                 new JButton("Victim Picked Up - Inform Hospital");
-        pickupButton.addActionListener(e -> pickUpVictim());
+        pickupVictimButton.addActionListener(e -> pickUpVictim());
 
-        JPanel actionPanel = new JPanel(
+        JPanel dashboardActionPanel = new JPanel(
                 new FlowLayout(FlowLayout.CENTER, 8, 0)
         );
-        actionPanel.add(pickupButton);
+        dashboardActionPanel.add(pickupVictimButton);
 
-        panel.add(header, BorderLayout.NORTH);
-        panel.add(dataSplitPane, BorderLayout.CENTER);
-        panel.add(actionPanel, BorderLayout.SOUTH);
+        dashboardPanel.add(dashboardHeader, BorderLayout.NORTH);
+        dashboardPanel.add(dashboardDataSplitPane, BorderLayout.CENTER);
+        dashboardPanel.add(dashboardActionPanel, BorderLayout.SOUTH);
 
-        setContentPane(panel);
+        setContentPane(dashboardPanel);
         refreshDashboard();
     }
 
     private void refreshDashboard() {
         try {
-            List<AccidentAlert> accidents =
-                    driverDAO.getAccidentsByZone(user.getZone());
-            List<Hospital> hospitals =
-                    driverDAO.getHospitalsByZone(user.getZone());
+            List<AccidentAlert> accidentAlerts =
+                    ambulanceDriverDAO.getAccidentsByZone(
+                            driverUser.getZone()
+                    );
+            List<Hospital> availableHospitals =
+                    ambulanceDriverDAO.getHospitalsByZone(
+                            driverUser.getZone()
+                    );
 
-            accidentTableModel.setRowCount(0);
-            for (AccidentAlert accident : accidents) {
-                accidentTableModel.addRow(new Object[]{
-                        accident.getAccidentId(),
-                        accident.getLocation(),
-                        accident.getReporterPhone(),
-                        accident.getSeverity(),
-                        accident.getVictimCount(),
-                        accident.getDescription(),
-                        accident.getStatus(),
-                        accident.getPickupTime()
+            accidentReportsTableModel.setRowCount(0);
+            for (AccidentAlert accidentAlert : accidentAlerts) {
+                accidentReportsTableModel.addRow(new Object[]{
+                        accidentAlert.getAccidentId(),
+                        accidentAlert.getLocation(),
+                        accidentAlert.getReporterPhone(),
+                        accidentAlert.getSeverity(),
+                        accidentAlert.getVictimCount(),
+                        accidentAlert.getDescription(),
+                        accidentAlert.getStatus(),
+                        accidentAlert.getPickupTime()
                 });
             }
 
-            hospitalTableModel.setRowCount(0);
-            for (Hospital hospital : hospitals) {
-                hospitalTableModel.addRow(new Object[]{
-                        hospital.getHospitalId(),
-                        hospital.getHospitalName(),
-                        hospital.getZone(),
-                        hospital.getAvailableBeds(),
-                        hospital.getPhoneNumber()
+            availableHospitalsTableModel.setRowCount(0);
+            for (Hospital availableHospital : availableHospitals) {
+                availableHospitalsTableModel.addRow(new Object[]{
+                        availableHospital.getHospitalId(),
+                        availableHospital.getHospitalName(),
+                        availableHospital.getZone(),
+                        availableHospital.getAvailableBeds(),
+                        availableHospital.getPhoneNumber()
                 });
             }
-        } catch (SQLException | IllegalArgumentException ex) {
+        } catch (SQLException | IllegalArgumentException dashboardLoadException) {
             JOptionPane.showMessageDialog(
                     this,
-                    "Could not load dashboard data.\n" + ex.getMessage(),
+                    "Could not load dashboard data.\n"
+                            + dashboardLoadException.getMessage(),
                     "Dashboard Error",
                     JOptionPane.ERROR_MESSAGE
             );
@@ -190,9 +212,9 @@ public class AmbulanceDriverFrame extends JFrame {
 
     private void pickUpVictim() {
         int selectedAccidentViewRow =
-                accidentTable.getSelectedRow();
+                accidentReportsTable.getSelectedRow();
         int selectedHospitalViewRow =
-                hospitalTable.getSelectedRow();
+                availableHospitalsTable.getSelectedRow();
 
         if (selectedAccidentViewRow < 0) {
             showSelectionWarning("Select an accident report first.");
@@ -204,84 +226,89 @@ public class AmbulanceDriverFrame extends JFrame {
             return;
         }
 
-        int accidentModelRow =
-                accidentTable.convertRowIndexToModel(
+        int selectedAccidentModelRow =
+                accidentReportsTable.convertRowIndexToModel(
                         selectedAccidentViewRow
                 );
-        int hospitalModelRow =
-                hospitalTable.convertRowIndexToModel(
+        int selectedHospitalModelRow =
+                availableHospitalsTable.convertRowIndexToModel(
                         selectedHospitalViewRow
                 );
 
-        int accidentId = (Integer) accidentTableModel.getValueAt(
-                accidentModelRow,
-                0
-        );
-        int hospitalId = (Integer) hospitalTableModel.getValueAt(
-                hospitalModelRow,
-                0
-        );
+        int selectedAccidentId =
+                (Integer) accidentReportsTableModel.getValueAt(
+                        selectedAccidentModelRow,
+                        0
+                );
+        int selectedHospitalId =
+                (Integer) availableHospitalsTableModel.getValueAt(
+                        selectedHospitalModelRow,
+                        0
+                );
 
-        String hospitalName = hospitalTableModel.getValueAt(
-                hospitalModelRow,
-                1
-        ).toString();
+        String selectedHospitalName =
+                availableHospitalsTableModel.getValueAt(
+                        selectedHospitalModelRow,
+                        1
+                ).toString();
 
-        int confirmation = JOptionPane.showConfirmDialog(
+        int pickupConfirmation = JOptionPane.showConfirmDialog(
                 this,
-                "Confirm victim pickup for accident ACC-" + accidentId
-                        + " and destination " + hospitalName + "?",
+                "Confirm victim pickup for accident ACC-"
+                        + selectedAccidentId
+                        + " and destination " + selectedHospitalName + "?",
                 "Confirm Pickup",
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE
         );
-        if (confirmation != JOptionPane.YES_OPTION) {
+        if (pickupConfirmation != JOptionPane.YES_OPTION) {
             return;
         }
 
         try {
-            Timestamp pickupTime =
-                    driverDAO.recordPickupAndNotifyHospital(
-                            accidentId,
-                            user.getUserId(),
-                            hospitalId
+            Timestamp recordedPickupTime =
+                    ambulanceDriverDAO.recordPickupAndNotifyHospital(
+                            selectedAccidentId,
+                            driverUser.getUserId(),
+                            selectedHospitalId
                     );
 
             JOptionPane.showMessageDialog(
                     this,
                     "Victim pickup recorded.\n"
-                            + "Pickup time: " + pickupTime
+                            + "Pickup time: " + recordedPickupTime
                             + "\n\nHospital notification:\n"
-                            + "Accident ACC-" + accidentId
+                            + "Accident ACC-" + selectedAccidentId
                             + ": a victim has been picked up and is being "
-                            + "taken to " + hospitalName
-                            + ". Pickup time: " + pickupTime,
+                            + "taken to " + selectedHospitalName
+                            + ". Pickup time: " + recordedPickupTime,
                     "Pickup Saved",
                     JOptionPane.INFORMATION_MESSAGE
             );
             refreshDashboard();
-        } catch (SQLException ex) {
+        } catch (SQLException pickupSaveException) {
             JOptionPane.showMessageDialog(
                     this,
-                    "Could not record victim pickup.\n" + ex.getMessage(),
+                    "Could not record victim pickup.\n"
+                            + pickupSaveException.getMessage(),
                     "Pickup Failed",
                     JOptionPane.ERROR_MESSAGE
             );
         }
     }
 
-    private void showSelectionWarning(String message) {
+    private void showSelectionWarning(String warningMessage) {
         JOptionPane.showMessageDialog(
                 this,
-                message,
+                warningMessage,
                 "Select Items",
                 JOptionPane.WARNING_MESSAGE
         );
     }
 
     private void logoutToHome() {
-        HomeFrame homeFrame = new HomeFrame();
-        homeFrame.setVisible(true);
+        HomeFrame homeDashboardFrame = new HomeFrame();
+        homeDashboardFrame.setVisible(true);
         dispose();
     }
 }

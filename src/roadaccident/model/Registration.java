@@ -8,15 +8,15 @@ public class Registration {
     private String role;
     private String zone;
 
-    // Ambulance Driver details
+    
     private String drivingLicenceNumber;
     private String ambulanceNumber;
 
-    // Hospital Staff details
+     
     private String hospitalName;
     private String designation;
 
-    // Police details
+    
     private String policeStation;
     private String badgeNumber;
 

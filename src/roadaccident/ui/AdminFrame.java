@@ -489,8 +489,9 @@ public class AdminFrame extends JFrame {
     private String getRoleDetails(
             ResultSet result,
             String role) throws SQLException {
+        String normalizedRole = normalizeRole(role);
 
-        if ("AMBULANCE_DRIVER".equals(role)) {
+        if ("AMBULANCE_DRIVER".equals(normalizedRole)) {
             return "Licence: "
                     + safeValue(
                             result.getString(
@@ -505,7 +506,7 @@ public class AdminFrame extends JFrame {
                     );
         }
 
-        if ("HOSPITAL_STAFF".equals(role)) {
+        if ("HOSPITAL_STAFF".equals(normalizedRole)) {
             return "Hospital: "
                     + safeValue(
                             result.getString(
@@ -520,7 +521,7 @@ public class AdminFrame extends JFrame {
                     );
         }
 
-        if ("POLICE".equals(role)) {
+        if ("POLICE".equals(normalizedRole)) {
             return "Station: "
                     + safeValue(
                             result.getString(
@@ -545,19 +546,29 @@ public class AdminFrame extends JFrame {
     }
 
     private String formatRole(String role) {
-        if ("AMBULANCE_DRIVER".equals(role)) {
+        String normalizedRole = normalizeRole(role);
+
+        if ("AMBULANCE_DRIVER".equals(normalizedRole)) {
             return "Ambulance Driver";
         }
 
-        if ("HOSPITAL_STAFF".equals(role)) {
+        if ("HOSPITAL_STAFF".equals(normalizedRole)) {
             return "Hospital Staff";
         }
 
-        if ("POLICE".equals(role)) {
+        if ("POLICE".equals(normalizedRole)) {
             return "Police";
         }
 
         return role;
+    }
+
+    private String normalizeRole(String role) {
+        return role == null
+                ? ""
+                : role.trim()
+                        .toUpperCase(Locale.ROOT)
+                        .replace(' ', '_');
     }
 
     private String formatZone(String zone) {

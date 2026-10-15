@@ -40,7 +40,12 @@ public class HospitalStaffDAO {
             VALUES (?, ?, 0, ?)
             """;
 
-        String normalizedZone = normalizeZone(zone);
+        if (zone == null || zone.isBlank()) {
+            throw new IllegalArgumentException(
+                    "The hospital staff account has no zone."
+            );
+        }
+        String hospitalZone = zone.trim();
         try (Connection connection = DatabaseConnection.getConnection()) {
             connection.setAutoCommit(false);
 
@@ -49,14 +54,14 @@ public class HospitalStaffDAO {
                         connection,
                         findSql,
                         hospitalName,
-                        normalizedZone
+                        hospitalZone
                 );
 
                 if (hospital == null) {
                     try (PreparedStatement statement =
                                  connection.prepareStatement(insertSql)) {
                         statement.setString(1, hospitalName.trim());
-                        statement.setString(2, normalizedZone);
+                        statement.setString(2, hospitalZone);
                         statement.setString(3, phoneNumber);
                         statement.executeUpdate();
                     }
@@ -65,7 +70,7 @@ public class HospitalStaffDAO {
                             connection,
                             findSql,
                             hospitalName,
-                            normalizedZone
+                            hospitalZone
                     );
                 }
 
@@ -113,27 +118,6 @@ public class HospitalStaffDAO {
                 );
             }
         }
-    }
-
-    private String normalizeZone(String zone) {
-        if (zone == null || zone.isBlank()) {
-            throw new IllegalArgumentException(
-                    "The hospital staff account has no zone."
-            );
-        }
-
-        String normalizedZone = zone.trim()
-                .toUpperCase(java.util.Locale.ROOT)
-                .replace('_', ' ');
-
-        if (normalizedZone.endsWith(" ZONE")) {
-            normalizedZone = normalizedZone.substring(
-                    0,
-                    normalizedZone.length() - " ZONE".length()
-            ).trim();
-        }
-
-        return normalizedZone;
     }
 
     public boolean updateAvailableBeds(
