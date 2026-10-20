@@ -14,7 +14,6 @@ public class Accident {
     private String description;
     private String status;
 
-    // Constructor used when creating a new accident
     public Accident(
             String name,
             String phone,
@@ -37,7 +36,6 @@ public class Accident {
         this.description = description;
     }
 
-    // Constructor used when reading data from database
     public Accident(
             int id,
             String name,
