@@ -196,13 +196,6 @@ public class AmbulanceDriverDAO {
             WHERE accident_id = ?
             """;
 
-        String updateHospitalSql = """
-            UPDATE hospitals
-            SET available_beds = available_beds - 1
-            WHERE hospital_id = ?
-            AND available_beds > 0
-            """;
-
         String notificationSql = """
             INSERT INTO notifications (
                 accident_id,
@@ -315,17 +308,6 @@ public class AmbulanceDriverDAO {
                     if (accidentUpdate.executeUpdate() == 0) {
                         throw new SQLException(
                                 "Accident status could not be updated."
-                        );
-                    }
-                }
-
-                try (PreparedStatement hospitalUpdate =
-                             connection.prepareStatement(updateHospitalSql)) {
-                    hospitalUpdate.setInt(1, hospitalId);
-
-                    if (hospitalUpdate.executeUpdate() == 0) {
-                        throw new SQLException(
-                                "Bed could not be reserved."
                         );
                     }
                 }
