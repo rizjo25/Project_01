@@ -11,7 +11,6 @@ import java.sql.Statement;
 
 public class AccidentDAO {
 
-    // Save accident
     public static int save(Accident accident) throws SQLException {
 
         String sql =
@@ -37,12 +36,11 @@ public class AccidentDAO {
             ps.setInt(8, accident.getNumberOfVictims());
             ps.setString(9, accident.getDescription());
 
-            // Initial status
+        
             ps.setString(10, "Reported");
 
             ps.executeUpdate();
 
-            // Get generated accident ID
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
                     return rs.getInt(1);
@@ -56,7 +54,6 @@ public class AccidentDAO {
     }
 
 
-    // Get accident using ID
     public static Accident getAccidentById(int id) throws SQLException {
 
         String sql =

@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Locale;
 
 public class RegistrationDAO {
 
@@ -48,11 +49,22 @@ public class RegistrationDAO {
         }
 
         String phoneNumber = normalizeText(registration.getPhoneNumber());
-        if (phoneNumber == null || phoneNumber.isEmpty()) {
+        String fullName = normalizeText(registration.getFullName());
+        String passwordHash = registration.getPassword();
+
+        if (phoneNumber == null || fullName == null
+                || passwordHash == null || passwordHash.isBlank()) {
             return false;
         }
 
         if (phoneNumberExists(phoneNumber)) {
+            return false;
+        }
+
+        String normalizedRole = convertRole(registration.getRole());
+        String normalizedZone = convertZone(registration.getZone());
+
+        if (normalizedRole == null || normalizedZone == null) {
             return false;
         }
 
@@ -79,18 +91,14 @@ public class RegistrationDAO {
              PreparedStatement statement =
                      connection.prepareStatement(sql)) {
 
-           
-            String passwordHash =
-                    registration.getPassword();
-
             statement.setString(
                     1,
-                    registration.getFullName()
+                    fullName
             );
 
             statement.setString(
                     2,
-                    registration.getPhoneNumber()
+                    phoneNumber
             );
 
             statement.setString(
@@ -100,12 +108,12 @@ public class RegistrationDAO {
 
             statement.setString(
                     4,
-                    registration.getRole()
+                    normalizedRole
             );
 
             statement.setString(
                     5,
-                    registration.getZone()
+                    normalizedZone
             );
 
             statement.setString(
@@ -176,9 +184,67 @@ public class RegistrationDAO {
         return normalizeText(value);
     }
 
+    private String convertRole(String role) {
+        String normalizedRole = normalizeText(role);
+        if (normalizedRole == null) {
+            return null;
+        }
+
+        switch (normalizedRole.toLowerCase(Locale.ROOT)) {
+            case "ambulance driver":
+            case "ambulance_driver":
+                return "AMBULANCE_DRIVER";
+            case "hospital staff":
+            case "hospital_staff":
+                return "HOSPITAL_STAFF";
+            case "police":
+                return "POLICE";
+            case "admin":
+                return "ADMIN";
+            default:
+                return normalizedRole.toUpperCase(Locale.ROOT).replace(' ', '_');
+        }
+    }
+
+    private String convertZone(String zone) {
+        String normalizedZone = normalizeText(zone);
+        if (normalizedZone == null) {
+            return null;
+        }
+
+        String withoutSuffix = normalizedZone
+                .toUpperCase(Locale.ROOT)
+                .replace("_", " ")
+                .replace("-", " ")
+                .trim();
+
+        if (withoutSuffix.endsWith(" ZONE")) {
+            withoutSuffix = withoutSuffix.substring(
+                    0,
+                    withoutSuffix.length() - " ZONE".length()
+            ).trim();
+        }
+
+        switch (withoutSuffix) {
+            case "KOZHIKODE":
+                return "KOZHIKODE";
+            case "WESTHILL":
+                return "WESTHILL";
+            case "EASTHILL":
+                return "EASTHILL";
+            default:
+                return withoutSuffix;
+        }
+    }
+
     public User login(
         String phoneNumber,
         String password) throws SQLException {
+
+    String normalizedPhoneNumber = normalizeText(phoneNumber);
+    if (normalizedPhoneNumber == null || password == null) {
+        return null;
+    }
 
     String sql = """
         SELECT
@@ -200,7 +266,7 @@ public class RegistrationDAO {
          PreparedStatement statement =
                  connection.prepareStatement(sql)) {
 
-        statement.setString(1, phoneNumber);
+        statement.setString(1, normalizedPhoneNumber);
 
         try (ResultSet result =
                      statement.executeQuery()) {
@@ -212,7 +278,6 @@ public class RegistrationDAO {
             String storedPassword =
                     result.getString("password_hash");
 
-        
             if (!password.equals(storedPassword)) {
                 return null;
             }

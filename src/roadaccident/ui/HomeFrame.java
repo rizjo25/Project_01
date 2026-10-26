@@ -152,18 +152,7 @@ buttonPanel.setPreferredSize(new Dimension(480, 410));
         exitButton =
                 new JButton("Exit");
 
-        for (JButton button : new JButton[]{
-                loginButton,
-                registrationButton,
-                reportAccidentButton,
-                checkStatusButton,
-                exitButton
-        }) {
-            button.setBackground(BLUE);
-            button.setForeground(Color.WHITE);
-            button.setFocusPainted(false);
-            button.setFont(new Font("SansSerif", Font.PLAIN, 35));
-        }
+
 
         panel.add(loginButton);
         panel.add(registrationButton);
