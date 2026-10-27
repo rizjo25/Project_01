@@ -90,6 +90,7 @@ CREATE TABLE IF NOT EXISTS notifications (
     notification_type VARCHAR(40) NOT NULL DEFAULT 'HOSPITAL_ALERT',
     notification_status VARCHAR(20) NOT NULL DEFAULT 'SENT',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    read_at TIMESTAMP NULL DEFAULT NULL,
     PRIMARY KEY (notification_id),
     KEY idx_notifications_hospital_created (hospital_id, created_at),
     KEY idx_notifications_accident (accident_id),

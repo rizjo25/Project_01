@@ -238,7 +238,8 @@ public class HospitalStaffDAO {
 
         String sql = """
             UPDATE notifications
-            SET notification_status = 'READ'
+            SET notification_status = 'READ',
+                read_at = COALESCE(read_at, CURRENT_TIMESTAMP)
             WHERE notification_id = ?
             """;
 

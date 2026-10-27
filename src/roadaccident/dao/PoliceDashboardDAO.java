@@ -120,11 +120,16 @@ public class PoliceDashboardDAO {
                 UNION ALL
 
                 SELECT
-                    n.created_at AS event_time,
-                    CONCAT('Hospital notified: ', n.message)
+                    n.read_at AS event_time,
+                    CONCAT(
+                        'Ambulance driver reached ',
+                        COALESCE(h.hospital_name, 'the hospital')
+                    )
                         AS event_description
                 FROM notifications n
+                LEFT JOIN hospitals h ON h.hospital_id = n.hospital_id
                 WHERE n.accident_id = ?
+                    AND n.read_at IS NOT NULL
 
                 UNION ALL
 
@@ -146,9 +151,10 @@ public class PoliceDashboardDAO {
         List<TimelineEvent> events = new ArrayList<>();
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
-            for (int parameter = 1; parameter <= 4; parameter++) {
-                statement.setInt(parameter, accidentId);
-            }
+            statement.setInt(1, accidentId);
+            statement.setInt(2, accidentId);
+            statement.setInt(3, accidentId);
+            statement.setInt(4, accidentId);
 
             try (ResultSet result = statement.executeQuery()) {
                 while (result.next()) {
