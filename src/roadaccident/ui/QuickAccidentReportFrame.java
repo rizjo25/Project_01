@@ -19,14 +19,14 @@ public class QuickAccidentReportFrame extends JFrame {
         AppTheme.applyTheme();
     }
 
-    // Location
+    
     private static final String[] LOCATIONS = {
             "KOZHIKODE ZONE",
             "WESTHILL ZONE",
             "EASTHILL ZONE"
     };
 
-    // Accident types
+
     private static final String[] ACCIDENT_TYPES = {
             "Collision",
             "Hit and Run",
@@ -37,7 +37,7 @@ public class QuickAccidentReportFrame extends JFrame {
             "Other"
     };
 
-    // Accident severity
+
     private static final String[] SEVERITIES = {
             "Minor",
             "Moderate",
@@ -45,7 +45,7 @@ public class QuickAccidentReportFrame extends JFrame {
             "Critical"
     };
 
-    // Form components
+
     private JTextField nameField;
     private JTextField phoneField;
     private JTextField dateField;
@@ -59,7 +59,7 @@ public class QuickAccidentReportFrame extends JFrame {
 
     private JTextArea descriptionArea;
 
-    // Constructor
+
     public QuickAccidentReportFrame() {
 
         setTitle("Report Accident");
@@ -70,21 +70,18 @@ public class QuickAccidentReportFrame extends JFrame {
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // Place window in the center of the screen
+        
         setLocationRelativeTo(null);
 
-        // Use BorderLayout
+
         setLayout(new BorderLayout());
 
-        // Add different parts of the window
+
         add(buildHeader(), BorderLayout.NORTH);
         add(buildFormScroll(), BorderLayout.CENTER);
         add(buildButtonBar(), BorderLayout.SOUTH);
     }
 
-    // --------------------------------------------------
-    // Header
-    // --------------------------------------------------
 
     private JPanel buildHeader() {
 
@@ -117,49 +114,44 @@ public class QuickAccidentReportFrame extends JFrame {
         return header;
     }
 
-    // --------------------------------------------------
-    // Form
-    // --------------------------------------------------
 
     private JScrollPane buildFormScroll() {
 
-        // Create text fields
+        
         nameField = new JTextField();
 
         phoneField = new JTextField();
 
-        // Automatically set current local date
+
         dateField = new JTextField(
                 LocalDate.now().toString()
         );
 
-        // Automatically set current local time
+
         timeField = new JTextField(
                 LocalTime.now().toString().substring(0, 5)
         );
 
-        // Location
+
         locationBox = new JComboBox<>(LOCATIONS);
 
-        // Accident type
+        
         typeBox = new JComboBox<>(ACCIDENT_TYPES);
 
-        // Accident severity
         severityBox = new JComboBox<>(SEVERITIES);
 
-        // Create spinner
+
         victimSpinner = new JSpinner(
                 new SpinnerNumberModel(1, 0, 999, 1)
         );
 
-        // Create description area
+
         descriptionArea = new JTextArea(4, 20);
 
         descriptionArea.setLineWrap(true);
 
         descriptionArea.setWrapStyleWord(true);
 
-        // Scroll pane for description
         JScrollPane descriptionScroll =
                 new JScrollPane(descriptionArea);
 
@@ -167,14 +159,14 @@ public class QuickAccidentReportFrame extends JFrame {
                 new Dimension(200, 100)
         );
 
-        // Main form panel
+
         JPanel form = new JPanel();
 
         form.setLayout(new BoxLayout(form, BoxLayout.Y_AXIS));
 
         form.setBorder(new EmptyBorder(10, 30, 10, 30));
 
-        // Add form fields
+
 
         addRow(
                 form,
@@ -215,7 +207,7 @@ public class QuickAccidentReportFrame extends JFrame {
                 block("DESCRIPTION", descriptionScroll)
         );
 
-        // Add form to scroll pane
+
         JScrollPane scroll = new JScrollPane(form);
 
         scroll.setVerticalScrollBarPolicy(
@@ -229,9 +221,7 @@ public class QuickAccidentReportFrame extends JFrame {
         return scroll;
     }
 
-    // --------------------------------------------------
-    // Create one field block
-    // --------------------------------------------------
+
 
     private JPanel block(String labelText, JComponent field) {
 
@@ -258,9 +248,7 @@ public class QuickAccidentReportFrame extends JFrame {
         return panel;
     }
 
-    // --------------------------------------------------
-    // Create a row
-    // --------------------------------------------------
+    
 
     private JPanel row(JComponent... items) {
 
@@ -277,9 +265,7 @@ public class QuickAccidentReportFrame extends JFrame {
         return panel;
     }
 
-    // --------------------------------------------------
-    // Add row to form
-    // --------------------------------------------------
+
 
     private void addRow(JPanel form, JComponent row) {
 
@@ -292,9 +278,7 @@ public class QuickAccidentReportFrame extends JFrame {
         );
     }
 
-    // --------------------------------------------------
-    // Buttons
-    // --------------------------------------------------
+
 
     private JPanel buildButtonBar() {
 
@@ -308,14 +292,14 @@ public class QuickAccidentReportFrame extends JFrame {
                 new EmptyBorder(15, 30, 25, 30)
         );
 
-        // Create Back button
+
         JButton backButton = new JButton("Back");
 
-        // Create Submit button
+        
         JButton submitButton =
                 new JButton("Submit Report");
 
-        // Set button size
+
         backButton.setPreferredSize(
                 new Dimension(150, 45)
         );
@@ -324,7 +308,6 @@ public class QuickAccidentReportFrame extends JFrame {
                 new Dimension(150, 45)
         );
 
-        // Back button event
         backButton.addActionListener(
                 new ActionListener() {
 
@@ -335,7 +318,6 @@ public class QuickAccidentReportFrame extends JFrame {
                 }
         );
 
-        // Submit button event
         submitButton.addActionListener(
                 new ActionListener() {
 
@@ -346,24 +328,18 @@ public class QuickAccidentReportFrame extends JFrame {
                 }
         );
 
-        // Add buttons
         panel.add(backButton);
 
         panel.add(submitButton);
 
-        // Pressing Enter will submit the form
         getRootPane().setDefaultButton(submitButton);
 
         return panel;
     }
 
-    // --------------------------------------------------
-    // Submit Accident Report
-    // --------------------------------------------------
 
     private void submitReport() {
 
-        // Get values from the form
 
         String name =
                 nameField.getText().trim();
@@ -382,7 +358,6 @@ public class QuickAccidentReportFrame extends JFrame {
         String description =
                 descriptionArea.getText().trim();
 
-        // Check name
         if (name.isEmpty()) {
 
             fail(
@@ -393,7 +368,7 @@ public class QuickAccidentReportFrame extends JFrame {
             return;
         }
 
-        // Check phone number
+
         if (!phone.matches("\\+?[0-9]{10}")) {
 
             fail(
@@ -404,13 +379,7 @@ public class QuickAccidentReportFrame extends JFrame {
             return;
         }
 
-        // No date validation
-        // Date is automatically taken from LocalDate.now()
 
-        // No time validation
-        // Time is automatically taken from LocalTime.now()
-
-        // Check description
         if (description.isEmpty()) {
 
             fail(
@@ -421,7 +390,6 @@ public class QuickAccidentReportFrame extends JFrame {
             return;
         }
 
-        // Create Accident object
         Accident accident = new Accident(
 
                 name,
@@ -443,7 +411,6 @@ public class QuickAccidentReportFrame extends JFrame {
                 description
         );
 
-        // Save accident
         int accidentId;
         try {
             accidentId = saveAccident(accident);
@@ -458,7 +425,7 @@ public class QuickAccidentReportFrame extends JFrame {
             return;
         }
 
-        // Show success message
+
         JOptionPane.showMessageDialog(
                 this,
                 "Accident reported successfully.\n\n"
@@ -471,22 +438,15 @@ public class QuickAccidentReportFrame extends JFrame {
                 JOptionPane.INFORMATION_MESSAGE
         );
 
-        // Go back to home page
         goHome();
     }
 
-    // --------------------------------------------------
-    // Save Accident
-    // --------------------------------------------------
 
     private int saveAccident(Accident accident) throws SQLException {
 
         return AccidentDAO.save(accident);
     }
 
-    // --------------------------------------------------
-    // Display Error Message
-    // --------------------------------------------------
 
     private void fail(
             String message,
@@ -500,23 +460,17 @@ public class QuickAccidentReportFrame extends JFrame {
                 JOptionPane.WARNING_MESSAGE
         );
 
-        // Move cursor to the incorrect field
         target.requestFocusInWindow();
     }
 
-    // --------------------------------------------------
-    // Go to Home Page
-    // --------------------------------------------------
 
     private void goHome() {
 
-        // Create HomeFrame
         HomeFrame home = new HomeFrame();
 
-        // Show HomeFrame
         home.setVisible(true);
 
-        // Close current window
+
         dispose();
     }
 }

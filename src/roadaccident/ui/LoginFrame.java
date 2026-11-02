@@ -24,7 +24,7 @@ public class LoginFrame extends JFrame {
     public LoginFrame() {
         setTitle("Road Accident Management System - Login");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(460, 370);
+        setSize(500, 400);
         setLocationRelativeTo(null);
         setResizable(false);
 
